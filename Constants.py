@@ -1,0 +1,12 @@
+NUM_CLASSES = 7  # our Y -> Angry, Sad, Happy..
+IMG_ROWS, IMG_COLS = 48, 48  # images are 48x48
+IMG_SIZE = (IMG_ROWS, IMG_COLS)
+BATCH_SIZE = 32  # number of samples to feed in an epoch
+TRAIN_DIR = 'C:/Users/97254/PyCharmProjects/FacialRec/images/train'
+VALIDATION_DIR = 'C:/Users/97254/PyCharmProjects/FacialRec/images/validation'
+EPOCHS = 25
+NUM_TRAIN_SAMPLES = 28821
+NUM_VALIDATION_SAMPLES = 7066
+RED_COLOR = (255, 0, 0)
+GREEN_COLOR = (0, 255, 0)
+RECTANGLE_THICKNESS = 2

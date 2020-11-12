@@ -7,16 +7,10 @@ from keras.optimizers import RMSprop, SGD, Adam
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 import os
 
-NUM_CLASSES = 7  # our Y -> Angry, Sad, Happy..
-IMG_ROWS, IMG_COLS = 48, 48  # images are 48x48
-BATCH_SIZE = 16  # number of samples to feed in an epoch
-TRAIN_DIR = 'C:/Users/97254/PyCharmProjects/FacialRec/images/train'
-VALIDATION_DIR = 'C:/Users/97254/PyCharmProjects/FacialRec/images/validation'
-EPOCHS = 50
-NUM_TRAIN_SAMPLES = 28821
-NUM_VALIDATION_SAMPLES = 7066
 
 # going to add more images to our dataset by manipulating existing ones
+import Constants
+
 train_data_generator = ImageDataGenerator(
 	rescale=1. / 255,  # maximum channels: 255
 	rotation_range=30,
@@ -34,18 +28,18 @@ test_data_generator = ImageDataGenerator(rescale=1. / 255)
 
 # Downloading the data from the folders and giving the model additional details on our data.
 train_generator = train_data_generator.flow_from_directory(
-	TRAIN_DIR,
+	Constants.TRAIN_DIR,
 	color_mode='grayscale',
-	target_size=(IMG_ROWS, IMG_COLS),
-	batch_size=BATCH_SIZE,
+	target_size=Constants.IMG_SIZE,
+	batch_size=Constants.BATCH_SIZE,
 	class_mode='categorical',
 	shuffle=True)
 
 validation_generator = train_data_generator.flow_from_directory(
-	VALIDATION_DIR,
+	Constants.VALIDATION_DIR,
 	color_mode='grayscale',
-	target_size=(IMG_ROWS, IMG_COLS),
-	batch_size=BATCH_SIZE,
+	target_size=Constants.IMG_SIZE,
+	batch_size=Constants.BATCH_SIZE,
 	class_mode='categorical',
 	subset='validation')
 
@@ -77,10 +71,10 @@ model = Sequential()
 
 # Block-1
 
-model.add(Conv2D(32, (3, 3), padding='same', kernel_initializer='he_normal', input_shape=(IMG_ROWS, IMG_COLS, 1)))
+model.add(Conv2D(32, (3, 3), padding='same', kernel_initializer='he_normal', input_shape=(Constants.IMG_ROWS, Constants.IMG_COLS, 1)))
 model.add(Activation('elu'))
 model.add(BatchNormalization())
-model.add(Conv2D(32, (3, 3), padding='same', kernel_initializer='he_normal', input_shape=(IMG_ROWS, IMG_COLS, 1)))
+model.add(Conv2D(32, (3, 3), padding='same', kernel_initializer='he_normal', input_shape=(Constants.IMG_ROWS, Constants.IMG_COLS, 1)))
 model.add(Activation('elu'))
 model.add(BatchNormalization())
 model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -136,7 +130,7 @@ model.add(Dropout(0.5))
 
 # Block-7
 
-model.add(Dense(NUM_CLASSES, kernel_initializer='he_normal'))
+model.add(Dense(Constants.NUM_CLASSES, kernel_initializer='he_normal'))
 model.add(Activation('softmax'))
 
 print(model.summary())
@@ -167,13 +161,13 @@ callbacks = [checkpoint, earlystop, reduce_lr]
 
 print("\nLoading model...")
 model.compile(loss='categorical_crossentropy',
-              optimizer = SGD(lr=0.001, momentum=0.9),
+              optimizer = Adam(lr=0.001),
               metrics=['accuracy'])
 
 history = model.fit_generator(
                 train_generator,
-                steps_per_epoch=NUM_TRAIN_SAMPLES//BATCH_SIZE,
-                epochs=EPOCHS,
+                steps_per_epoch=Constants.NUM_TRAIN_SAMPLES//Constants.BATCH_SIZE,
+                epochs=Constants.EPOCHS,
                 callbacks=callbacks,
                 validation_data=validation_generator,
-                validation_steps=NUM_VALIDATION_SAMPLES//BATCH_SIZE)
+                validation_steps=Constants.NUM_VALIDATION_SAMPLES//Constants.BATCH_SIZE)
